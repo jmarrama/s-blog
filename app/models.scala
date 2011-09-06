@@ -12,6 +12,7 @@ import play.db.anorm._
 import play.db.anorm.SqlParser._
 import play.db.anorm.defaults._
 import java.util.Date
+import play.data.validation._
 
 // User
 
@@ -39,31 +40,55 @@ case class Post(
     content: String,
     postedAt: Date,
     author_id: Long
-)
+) {
+    def prevNext = {
+        SQL(
+            """
+                (
+                    select *, 'next' as pos from post
+                    where postedAt < {date} order by postedAt desc limit 1
+                )
+                    union
+                (
+                    select *, 'prev' as pos from post
+                    where postedAt > {date} order by postedAt asc limit 1
+                )
+
+                order by postedAt desc
+
+            """
+        ).on("date" -> postedAt).as(
+            opt('pos.is("prev")~>Post.on("")) ~ opt('pos.is("next")~>Post.on(""))
+            ^^ flatten
+        )
+    }
+
+}
+
 
 object Post extends Magic[Post] {
 
-  def allWithAuthorAndComments:List[(Post,User,List[Comment])] = {
-    SQL(
-        """
-            select * from Post p
-            join User u on p.author_id = u.id
-            left join Comment c on c.post_id = p.id
-            order by p.postedAt desc
-        """
-    ).as( Post ~< User ~< Post.spanM( Comment ) ^^ flatten * )
-  }
+    def allWithAuthorAndComments:List[(Post,User,List[Comment])] = {
+        SQL(
+            """
+                select * from Post p
+                join User u on p.author_id = u.id
+                left join Comment c on c.post_id = p.id
+                order by p.postedAt desc
+            """
+        ).as( Post ~< User ~< Post.spanM( Comment ) ^^ flatten * )
+    }
 
-  def byIdWithAuthorAndComments(id: Long):Option[(Post,User,List[Comment])] = {
-    SQL(
-        """
-            select * from Post p
-            join User u on p.author_id = u.id
-            left join Comment c on c.post_id = p.id
-            where p.id = {id}
-        """
-    ).on("id" -> id).as( Post ~< User ~< Post.spanM( Comment ) ^^ flatten ? )
-  }
+    def byIdWithAuthorAndComments(id: Long):Option[(Post,User,List[Comment])] = {
+        SQL(
+            """
+                select * from Post p
+                join User u on p.author_id = u.id
+                left join Comment c on c.post_id = p.id
+                where p.id = {id}
+            """
+        ).on("id" -> id).as( Post ~< User ~< Post.spanM( Comment ) ^^ flatten ? )
+    }
 
 }
 
@@ -77,8 +102,8 @@ case class Comment(
 
 object Comment extends Magic[Comment] {
 
-  def apply(post_id: Long, author: String, content: String) = {
-    new Comment(NotAssigned, author, content, new Date(), post_id)
-  }
+    def apply(post_id: Long, author: String, content: String) = {
+        new Comment(NotAssigned, author, content, new Date(), post_id)
+    }
 
 }

@@ -1,0 +1,56 @@
+@(
+    post:(models.Post,models.User,Seq[models.Comment]),
+    pagination:(Option[models.Post],Option[models.Post])
+)(
+    implicit
+    params:play.mvc.Scope.Params,
+    flash:play.mvc.Scope.Flash,
+    errors:Map[String,play.data.validation.Error]
+)
+ 
+@main(title = post._1.title) {
+
+    
+    @display(post)
+
+    @paginate(pagination)
+
+    @comments(post)
+
+
+    <h3>Post a comment</h3>
+
+    @form(controllers.Application.postComment(post._1.id())) {
+
+        @if(errors){
+            <p class="error">All fields are required!</p>
+        }
+
+        @if(flash.get("success")) {
+            <p class="success">@flash.get("success")</p>
+        }
+
+
+        <p>
+            <label for="author">Your name: </label>
+            <input type="text" name="author" />
+        </p>
+        <p>
+            <label for="content">Your message: </label>
+            <textarea name="content"></textarea>
+        </p>
+        <p>
+            <input type="submit" value="Submit your comment" />
+        </p>
+    }
+
+    <script type="text/javascript" charset="utf-8">
+        $(function() {
+            // If there is an error, focus to form
+            if($('form .error').size()) {
+                $('form').expose({api: true, loadSpeed: 0}).load();
+                $('form input[type=text]').get(0).focus();
+            }
+        });
+    </script>
+}

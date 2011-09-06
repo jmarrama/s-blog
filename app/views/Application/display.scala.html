@@ -10,7 +10,7 @@
 
 <div class="post @mode">
     <h2 class="post-title">
-        <a href="#">@post._1.title</a>
+        <a href="@action(controllers.Application.show(post._1.id()))">@post._1.title</a>
     </h2>
     <div class="post-metadata">
         <span class="post-author">by @post._2.fullname</span>,
@@ -19,7 +19,7 @@
         </span>
         @if(mode != "full") {
             <span class="post-comments">
-                @commentsTitle
+                - @commentsTitle
             </span>
         }
     </div>
@@ -31,28 +31,3 @@
     }
 </div>
 
-@if(mode == "full") {
-
-    <div class="comments">
-        <h3>
-            @commentsTitle
-        </h3>
-
-        @post._3.map { comment =>
-            <div class="comment">
-                <div class="comment-metadata">
-                    <span class="comment-author">by @comment.author,</span>
-                    <span class="comment-date">
-                        @comment.postedAt.format("dd MMM yy")
-                    </span>
-                </div>
-                <div class="comment-content">
-                    <div class="about">Detail: </div>
-                    @Html(comment.content.replace("\n", "<br>"))
-                </div>
-            </div>
-        }
-
-    </div>
-
-}

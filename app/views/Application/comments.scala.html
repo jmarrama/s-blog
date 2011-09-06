@@ -1,0 +1,31 @@
+@(post:(models.Post,models.User,Seq[models.Comment]))
+
+@commentsTitle = {
+    @if(post._3) {
+        @post._3.size comments, latest by @post._3(0).author
+    } else {
+        No comments to display
+    }
+}
+
+
+<div class="comments">
+    <h3>
+        @commentsTitle
+    </h3>
+
+    @post._3.map { comment =>
+        <div class="comment">
+            <div class="comment-metadata">
+                <span class="comment-author">by @comment.author,</span>
+                <span class="comment-date">
+                    @comment.postedAt.format("dd MMM yy")
+                </span>
+            </div>
+            <div class="comment-content">
+                <div class="about">Detail: </div>
+                @Html(comment.content.replace("\n", "<br>"))
+            </div>
+        </div>
+    }
+</div>
