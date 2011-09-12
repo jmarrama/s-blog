@@ -1,0 +1,35 @@
+@()(
+    implicit
+    params:play.mvc.Scope.Params,
+    flash:play.mvc.Scope.Flash,
+    errors:Map[String,play.data.validation.Error],
+    session:play.mvc.Scope.Session
+)
+
+@main(title = "Login") {
+
+    @form(controllers.Application.createPost) {
+
+        @if(errors){
+            <p class="error">
+                @errors.map{ err =>
+                   @err._2<br>
+                }
+            </p>
+        }
+
+        <p>
+            <label for="post-name">Post Name: </label>
+            <input type="text" name="post-name" />
+        </p>
+
+        <p>
+            <label for="content">Post Contents: </label>
+            <textarea name="content"></textarea>
+        </p>
+        <p>
+            <input type="submit" value="Post It!" />
+        </p>
+
+    }
+}

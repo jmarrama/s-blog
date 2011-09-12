@@ -1,13 +1,21 @@
 @(
-    front:Option[(models.Post,models.User,Seq[models.Comment])], 
+    front:Option[(models.Post,models.User,Seq[models.Comment])],
+    frontfive:Seq[(models.Post,models.User,Seq[models.Comment])],
     older:Seq[(models.Post,models.User,Seq[models.Comment])]
+)(
+    implicit
+    session:play.mvc.Scope.Session
 )
  
 @main(title = "Home") {
     
     @front.map { front =>
-        
-        @display(front, mode = "home")
+
+        @Option(frontfive).filterNot(_.isEmpty).map { ffive =>
+            @ffive.map { ffpost =>
+                @display(ffpost, mode = "home")
+            }
+        }
  
         @Option(older).filterNot(_.isEmpty).map { posts =>
  

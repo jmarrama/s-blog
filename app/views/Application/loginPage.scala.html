@@ -1,0 +1,33 @@
+@()(
+    implicit
+    errors:Map[String,play.data.validation.Error],
+    session:play.mvc.Scope.Session
+)
+
+@main(title = "Login") {
+
+    @form(controllers.Application.authenticate) {
+
+        @if(errors){
+            <p class="error">
+                @errors.map{ err =>
+                   @err._2<br>
+                }
+            </p>
+        }
+
+        <p>
+            <label for="username">Username: </label>
+            <input type="text" name="username" />
+        </p>
+
+        <p>
+            <label for="password">Password: </label>
+            <input type="password" name="password" />
+        </p>
+        <p>
+            <input type="submit" value="Login" />
+        </p>
+
+    }
+}

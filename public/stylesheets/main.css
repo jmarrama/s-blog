@@ -60,6 +60,17 @@ body {
     -moz-border-radius: 16px;
 }
 
+.code {
+    background: #B8C569;
+    padding: 5px 5px 5px 5px;
+    color: black;
+    position: relative;
+}
+
+pre {
+    background: #B8C569;
+}
+
 /** A little hacky to create arrows without images **/
 .about {
     text-indent: -999em;

@@ -1,4 +1,4 @@
-@(post:(models.Post,models.User,Seq[models.Comment]), mode: String = "full")
+@(post:(models.Post,models.User,Seq[models.Comment]), mode: String = "full", isadmin:Boolean = false)
 
 @commentsTitle = {
     @if(post._3) {
@@ -15,7 +15,7 @@
     <div class="post-metadata">
         <span class="post-author">by @post._2.fullname</span>,
         <span class="post-date">
-            @post._1.postedAt.format("dd MMM yy")
+            @post._1.dateStr
         </span>
         @if(mode != "full") {
             <span class="post-comments">
@@ -28,6 +28,9 @@
             <div class="about">Detail: </div>
             @Html(post._1.content.replace("\n", "<br>"))
         </div>
+    }
+    @if(isadmin){
+        <a href="@action(controllers.Application.deletePost(post._1.id.get.get))">Delete Post</a>
     }
 </div>
 

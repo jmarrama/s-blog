@@ -1,21 +1,23 @@
 @(
     post:(models.Post,models.User,Seq[models.Comment]),
-    pagination:(Option[models.Post],Option[models.Post])
+    pagination:(Option[models.Post],Option[models.Post]),
+    randomID: String,
+    isadmin: Boolean = false
 )(
     implicit
     params:play.mvc.Scope.Params,
     flash:play.mvc.Scope.Flash,
-    errors:Map[String,play.data.validation.Error]
+    errors:Map[String,play.data.validation.Error],
+    session:play.mvc.Scope.Session
 )
  
 @main(title = post._1.title) {
 
-    
-    @display(post)
+    @display(post, "full", isadmin)
 
     @paginate(pagination)
 
-    @comments(post)
+    @comments(post, isadmin)
 
 
     <h3>Post a comment</h3>
@@ -23,7 +25,11 @@
     @form(controllers.Application.postComment(post._1.id())) {
 
         @if(errors){
-            <p class="error">All fields are required!</p>
+            <p class="error">
+                @errors.map{ err =>
+                   @err._2<br>
+                }
+            </p>
         }
 
         @if(flash.get("success")) {
@@ -38,6 +44,13 @@
         <p>
             <label for="content">Your message: </label>
             <textarea name="content"></textarea>
+        </p>
+        <p>
+            <label for="code">Please answer the question below: </label>
+            <iframe src="@action(controllers.Application.captcha(randomID))" width="200" height="60"></iframe>
+            <br>
+            <input type="text" name="code" id="code" size="18" value="">
+            <input type="hidden" name="randomID" value="@randomID">
         </p>
         <p>
             <input type="submit" value="Submit your comment" />

@@ -1,4 +1,4 @@
-@(post:(models.Post,models.User,Seq[models.Comment]))
+@(post:(models.Post,models.User,Seq[models.Comment]), isadmin:Boolean = false)
 
 @commentsTitle = {
     @if(post._3) {
@@ -19,13 +19,16 @@
             <div class="comment-metadata">
                 <span class="comment-author">by @comment.author,</span>
                 <span class="comment-date">
-                    @comment.postedAt.format("dd MMM yy")
+                    @comment.dateStr
                 </span>
             </div>
             <div class="comment-content">
                 <div class="about">Detail: </div>
                 @Html(comment.content.replace("\n", "<br>"))
             </div>
+            @if(isadmin){
+                <a href="@action(controllers.Application.deleteComment(comment.id.get.get, post._1.id.get.get))">Delete Comment</a>
+            }
         </div>
     }
 </div>

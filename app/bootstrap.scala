@@ -1,10 +1,11 @@
+
 /**
- * Created by IntelliJ IDEA.
- * User: jmarrama
- * Date: 8/27/11
- * Time: 12:13 PM
- * To change this template use File | Settings | File Templates.
- */
+* Created by IntelliJ IDEA.
+* User: jmarrama
+* Date: 9/10/11
+* Time: 9:56 AM
+* To change this template use File | Settings | File Templates.
+*/
 
 import play.jobs._
 
@@ -29,4 +30,3 @@ import play.jobs._
     }
 
 }
-

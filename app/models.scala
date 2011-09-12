@@ -11,8 +11,11 @@ package models
 import play.db.anorm._
 import play.db.anorm.SqlParser._
 import play.db.anorm.defaults._
-import java.util.Date
 import play.data.validation._
+import java.sql.{ Timestamp, SQLException }
+import java.text.SimpleDateFormat
+import java.util.Date
+
 
 // User
 
@@ -38,7 +41,8 @@ case class Post(
     id: Pk[Long],
     title: String,
     content: String,
-    postedAt: Date,
+    postedAt: Long,
+    dateStr: String,
     author_id: Long
 ) {
     def prevNext = {
@@ -63,10 +67,17 @@ case class Post(
         )
     }
 
+
 }
 
 
 object Post extends Magic[Post] {
+    val dateFormatter = new SimpleDateFormat("MM-dd HH:mm:ss")
+
+    def apply(author_id: Long, title: String, content: String) = {
+        val curtime = new Date()
+        new Post(NotAssigned, title, content, curtime.getTime, dateFormatter.format(curtime), author_id)
+    }
 
     def allWithAuthorAndComments:List[(Post,User,List[Comment])] = {
         SQL(
@@ -90,20 +101,45 @@ object Post extends Magic[Post] {
         ).on("id" -> id).as( Post ~< User ~< Post.spanM( Comment ) ^^ flatten ? )
     }
 
+    def deleteById(id: Long) = {
+        SQL(
+            """
+             delete from Post where id = {id}
+            """
+        ).on("id" -> id).executeUpdate().fold(
+            e => "Oops, there was an error" ,
+            c => c + " rows were updated!"
+        )
+    }
+
 }
 
 case class Comment(
     id: Pk[Long],
     author: String,
     content: String,
-    postedAt: Date,
+    postedAt: Long,
+    dateStr: String,
     post_id: Long
 )
 
 object Comment extends Magic[Comment] {
+    val dateFormatter = new SimpleDateFormat("MM-dd HH:mm:ss")
 
     def apply(post_id: Long, author: String, content: String) = {
-        new Comment(NotAssigned, author, content, new Date(), post_id)
+        val curtime = new Date()
+        new Comment(NotAssigned, author, content, curtime.getTime, dateFormatter.format(curtime), post_id)
+    }
+
+    def deleteById(id: Long) = {
+        SQL(
+            """
+             delete from Comment where id = {id}
+            """
+        ).on("id" -> id).executeUpdate().fold(
+            e => "Oops, there was an error" ,
+            c => c + " rows were updated!"
+        )
     }
 
 }
